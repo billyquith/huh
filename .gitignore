@@ -1,6 +1,7 @@
 
 build*/
 
-*.py[cod]
-__pycache__/
-
+local/bin/*
+local/include/*
+local/lib/*
+local/share/*
