@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = http://luajit.org/git/luajit-2.0.git
+	branch = master
+	commit = a68c4118572529e0223cad3d4f2d214a54b1ab7a
+	parent = f0bf43d3d7424fbd9b9c4214e0fa225f51e7e869
+	cmdver = 0.3.0
