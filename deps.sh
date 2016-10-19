@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 
+if [ "$1" == "-u" ]; then
+    UPDATE=1
+fi
+
 THISDIR="$(cd $(dirname $0); pwd -P)"
+
+if [ ! -z $UPDATE ]; then
+    # get latest LuaJIT and force rebuild
+    git-subrepo pull ext/luajit
+    rm local/bin/luajit
+fi
 
 # LuaJIT
 if [ ! -e local/bin/luajit ]; then
