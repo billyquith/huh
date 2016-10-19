@@ -3,17 +3,30 @@ set(HUH_SOURCES
     huh.h
     huh.c)
 
-set(TEST_SOURCES
+set(MAIN_SOURCES
     main.c)
 
-find_package(ALLEGRO5 5.2 REQUIRED)
-include_directories(${ALLEGRO5_INCLUDE_DIRS})
+set(LUAJIT_CL "${EXT_DIR}/luajit/src/luajit.c")
 
+find_package(ALLEGRO5 5.2 REQUIRED)
 find_package(OpenGL REQUIRED)
 
-add_library(huh SHARED ${HUH_SOURCES})
-target_link_libraries(huh ${ALLEGRO5_LIBRARIES} ${OPENGL_LIBRARIES})
-    
-add_executable(huh_test ${TEST_SOURCES})
-target_link_libraries(huh_test huh ${ALLEGRO5_LIBRARIES})
+include_directories(${LOCAL_DIR}/include ${ALLEGRO5_INCLUDE_DIRS})
 
+
+add_executable(huh ${MAIN_SOURCES} ${HUH_SOURCES})
+
+target_compile_definitions(huh PRIVATE HUH_LUAJIT_PATH="${LUAJIT_CL}")
+
+if (APPLE)
+    # As mention in "Embedding LuaJIT" docs: http://luajit.org/install.html
+    set_target_properties(huh PROPERTIES LINK_FLAGS "-pagezero_size 10000 -image_base 100000000")
+endif()
+
+target_link_libraries(huh
+    ${ALLEGRO5_LIBRARIES}
+    ${OPENGL_LIBRARIES}
+     -L${LOCAL_DIR}/lib -lluajit-5.1)
+
+# set <TARGET>_OUTPUT_DIRECTORY_<CONFIG>
+set_target_properties(huh PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${LOCAL_DIR}/bin)

@@ -5,8 +5,8 @@
 #include <allegro5/allegro_opengl.h>
 
 
-GLuint tex, fbo;
-bool no_fbo = false;
+static GLuint tex, fbo;
+static bool no_fbo = false;
 
 static void abort_example(char const *format, ...)
 {
@@ -204,7 +204,3 @@ done:
    return 0;
 }
 
-// int main(int argc, char **argv)
-// {
-//     return huh_run();
-// }

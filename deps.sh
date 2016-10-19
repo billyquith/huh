@@ -5,7 +5,7 @@ THISDIR="$(cd $(dirname $0); pwd -P)"
 # LuaJIT
 if [ ! -e local/bin/luajit ]; then
     pushd ext/luajit
-    make install HUH_PREFIX="$THISDIR/local"
+    make install PREFIX="$THISDIR/local"
     make clean
     popd
 fi
