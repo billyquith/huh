@@ -1,7 +1,15 @@
 
 set(HUH_SOURCES
     huh.h
-    huh.c)
+    huh.c
+
+    nanovg/nanovg.h
+    nanovg/nanovg.c
+    nanovg/nanovg_gl.h
+    nanovg/nanovg_gl_utils.h
+    nanovg/fontstash.h
+    nanovg/stb_image.h
+    nanovg/stb_truetype.h)
 
 set(MAIN_SOURCES
     main.c)
