@@ -1,4 +1,4 @@
 
-extern int huh_run();
+int huh_init();
 
-    
+

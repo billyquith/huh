@@ -2,6 +2,7 @@
 build*/
 
 local/bin/*
+!local/bin/*.lua
 local/include/*
 local/lib/*
 local/share/*
