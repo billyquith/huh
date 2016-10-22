@@ -3,6 +3,7 @@
 #include <math.h>
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_opengl.h>
+#include "vg.h"
 
 static ALLEGRO_DISPLAY *g_display = NULL;
 static ALLEGRO_EVENT_QUEUE *g_queue = NULL;
@@ -16,11 +17,11 @@ static struct AppInfo g_appInfo;
 
 static void abort_huh(char const *format, ...)
 {
-   va_list args;
-   va_start(args, format);
-   vfprintf(stderr, format, args);
-   va_end(args);
-   exit(1);
+    va_list args;
+    va_start(args, format);
+    vfprintf(stderr, format, args);
+    va_end(args);
+    exit(1);
 }
 
 static void open_log(void)
@@ -29,21 +30,21 @@ static void open_log(void)
 
 static void close_log(bool wait_for_user)
 {
-   (void)wait_for_user;
+    (void)wait_for_user;
 }
 
-static void log_printf(char const *format, ...)
+void log_printf(char const *format, ...)
 {
-   va_list args;
-   va_start(args, format);
+    va_list args;
+    va_start(args, format);
 #ifdef ALLEGRO_ANDROID
-   char x[1024];
-   vsnprintf(x, sizeof x, format, args);
-   ALLEGRO_TRACE_CHANNEL_LEVEL("log", 1)(x);
+    char x[1024];
+    vsnprintf(x, sizeof x, format, args);
+    ALLEGRO_TRACE_CHANNEL_LEVEL("log", 1)(x);
 #else
-   vprintf(format, args);
+    vprintf(format, args);
 #endif
-   va_end(args);
+    va_end(args);
 }
 
 int huh_init()
@@ -70,8 +71,13 @@ int huh_close()
 {
     log_printf("%.1f FPS\n", g_appInfo.frameCount / (al_get_time() - g_appInfo.appStartTime));
     
-    al_destroy_event_queue(g_queue);
-    al_destroy_display(g_display);
+    if (g_queue)
+        al_destroy_event_queue(g_queue);
+    
+    vg_close();
+    
+    if (g_display)
+        al_destroy_display(g_display);
     
     close_log(true);
     
@@ -81,6 +87,11 @@ int huh_close()
 ALLEGRO_EVENT_QUEUE* huh_getEventQueue()
 {
     return g_queue;
+}
+
+struct NVGcontext* huh_nanovg()
+{
+    return vg_context();
 }
 
 ALLEGRO_DISPLAY* huh_createDisplay(int width, int height)
@@ -93,11 +104,35 @@ ALLEGRO_DISPLAY* huh_createDisplay(int width, int height)
     if (!g_display) {
         abort_huh("Could not create display.\n");
     }
+    
+    // information about OpenGL
+    char *gldesc = NULL;
+    int glvar = al_get_opengl_variant();
+    gldesc = glvar == ALLEGRO_OPENGL_ES ? "OpenGL ES" : "OpenGL";
+    uint32_t glver = al_get_opengl_version();
+    log_printf("Using %s %d.%d%d\n", gldesc, (glver>>24)&0xff, (glver>>16)&0xff, (glver>>8)&0xff);
+    
+    if (vg_init() != 0)
+        abort_huh("Nanovg context creation failed.\n");
 
     assert(g_queue);
     al_register_event_source(g_queue, al_get_display_event_source(g_display));
 
     return g_display;
+}
+
+int huh_frameBegin()
+{
+    vg_frameBegin();
+    return 0;
+}
+
+int huh_frameEnd()
+{
+    vg_frameEnd();
+    al_flip_display();
+    ++g_appInfo.frameCount;
+    return 0;
 }
 
 int huh_run(void(*update)())
@@ -122,13 +157,6 @@ int huh_run(void(*update)())
         }
         update();
     }
-    return 0;
-}
-
-int huh_frameEnd()
-{
-    al_flip_display();
-    ++g_appInfo.frameCount;
     return 0;
 }
 

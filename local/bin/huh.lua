@@ -9,9 +9,11 @@ int huh_init();
 int huh_close();
 
 ALLEGRO_DISPLAY* huh_createDisplay(int width, int height);
+int huh_frameBegin();
 int huh_frameEnd();  // swap
 
 ALLEGRO_EVENT_QUEUE* huh_getEventQueue();
+struct NVGcontext* huh_nanovg();
 ]]
 
 local huh = {}
@@ -49,7 +51,9 @@ huh.run = function(h)
             end            
         end
         hdlr.onUpdate()
+        ffi.C.huh_frameBegin()
         hdlr.onDraw()
+        ffi.C.huh_frameEnd()
     end
 end
 
