@@ -767,7 +767,7 @@ OUI_EXPORT int uiGetLastItemCount();
     #define UI_INLINE
     #endif
 #else
-    #define UI_INLINE inline
+    #define UI_INLINE static inline
 #endif
 
 #define UI_MAX_KIND 16
@@ -1035,7 +1035,7 @@ int uiGetLastButton(int button) {
     return (ui_context->last_buttons & (1ull<<button))?1:0;
 }
 
-int uiGetButton(int button) {
+int uiGetButton(unsigned int button) {
     assert(ui_context);
     return (ui_context->buttons & (1ull<<button))?1:0;
 }

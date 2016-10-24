@@ -1138,7 +1138,7 @@ static double bnd_fmax ( double a, double b )
 }
 
 #else
-    #define BND_INLINE inline
+    #define BND_INLINE static inline
     #define bnd_fminf(a, b) fminf(a, b)
     #define bnd_fmaxf(a, b) fmaxf(a, b)
     #define bnd_fmin(a, b) fmin(a, b)
@@ -1923,7 +1923,7 @@ float bndLabelHeight(NVGcontext *ctx, int iconid, const char *label, float width
         nvgFontSize(ctx, BND_LABEL_FONT_SIZE);
         float bounds[4];
         nvgTextBoxBounds(ctx, 1, 1, width, label, NULL, bounds);
-        int bh = int(bounds[3] - bounds[1]) + BND_TEXT_PAD_DOWN;
+        int bh = (int)(bounds[3] - bounds[1]) + BND_TEXT_PAD_DOWN;
         if (bh > h)
         	h = bh;
     }

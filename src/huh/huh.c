@@ -7,6 +7,7 @@
 
 static ALLEGRO_DISPLAY *g_display = NULL;
 static ALLEGRO_EVENT_QUEUE *g_queue = NULL;
+static char *g_resDir = NULL;
 
 struct AppInfo {
     double appStartTime;
@@ -54,6 +55,13 @@ int huh_init()
     }
     
     open_log();
+    
+    char buff[256];
+    char *hpath = getenv("HUH_PATH");
+    strcpy(buff, hpath ? hpath : ".");
+    strcat(buff, "/res");
+    g_resDir = strdup(buff);
+    log_printf("Resource dir: %s\n", g_resDir);
 
     al_install_keyboard();
 
@@ -81,7 +89,25 @@ int huh_close()
     
     close_log(true);
     
+    if (g_resDir)
+        free(g_resDir);
+    
     return 0;
+}
+
+const char* huh_resDir()
+{
+    return g_resDir;
+}
+
+const char* huh_resPath(const char *relPath)
+{
+    static char rpath[256];
+    strcpy(rpath, huh_resDir());
+    strcat(rpath, "/");
+    strcat(rpath, relPath);
+    //log_printf("Res: %s\n", rpath);
+    return rpath;
 }
 
 ALLEGRO_EVENT_QUEUE* huh_getEventQueue()
@@ -112,8 +138,11 @@ ALLEGRO_DISPLAY* huh_createDisplay(int width, int height)
     uint32_t glver = al_get_opengl_version();
     log_printf("Using %s %d.%d%d\n", gldesc, (glver>>24)&0xff, (glver>>16)&0xff, (glver>>8)&0xff);
     
-    if (vg_init() != 0)
-        abort_huh("Nanovg context creation failed.\n");
+    struct VgInfo vgi = {
+        .wwid = width, .whei = height, .wpixRatio = (float)width / height
+    };
+    if (vg_init(vgi) != 0)
+        abort_huh("Nanovg context creation failed.\n");        
 
     assert(g_queue);
     al_register_event_source(g_queue, al_get_display_event_source(g_display));
