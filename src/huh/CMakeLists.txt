@@ -14,7 +14,10 @@ set(HUH_SOURCES
     nanovg/stb_truetype.h
 
     blendish/blendish.h
-    blendish/oui.h)
+    blendish/oui.h
+
+    nanosvg.h
+    nanosvgrast.h)
 
 set(MAIN_SOURCES
     main.c)

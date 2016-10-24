@@ -5,6 +5,11 @@
 #define NANOVG_GL2_IMPLEMENTATION
 #include "nanovg/nanovg_gl.h"
 
+#define NANOSVG_IMPLEMENTATION
+#include "nanosvg.h"
+#define NANOSVGRAST_IMPLEMENTATION
+#include "nanosvgrast.h"
+
 #include "huh.h"
 
 static NVGcontext *g_ctx = NULL;
