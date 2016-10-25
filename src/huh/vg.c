@@ -98,6 +98,7 @@ void vg_frameEnd()
 
 enum huiType {
     ST_BACKGROUND,
+    ST_ITEM,
     ST_LABEL,
     ST_BUTTON,
     ST_RADIO,
@@ -161,22 +162,34 @@ typedef struct {
     int maxsize;
 } UITextData;
 
-static void huiHandlerHandler(int item, UIevent event)
+
+void huiSetDrawer(int item, huiDrawer d)
 {
     UIData *data = (UIData *)uiGetHandle(item);
-    if (data && data->handler)
+    if (data)
     {
-        data->handler(item, event);
+        data->drawer = d;
     }
 }
 
-void drawUIItems(NVGcontext *vg, int item, int corners)
+static void drawUIItems(NVGcontext *vg, int item, int corners)
 {
     int kid = uiFirstChild(item);
     while (kid > 0) {
         drawUI(vg, kid, corners);
         kid = uiNextSibling(kid);
     }
+}
+
+int huiItem()
+{
+    int item = uiItem();
+    UIData *data = (UIData*) uiAllocHandle(item, sizeof(UIData));
+    data->subtype = ST_ITEM;
+    data->handler = NULL;
+    data->drawer = drawUIItems;
+    uiSetBox(item, UI_ROW);
+    return item;
 }
 
 static void drawUIItemsHbox(NVGcontext *vg, int item, int corners)
@@ -300,15 +313,17 @@ int huiButton(int iconid, const char *label, UIhandler handler)
 
 static void drawUI(NVGcontext *vg, int item, int corners)
 {
-    const UIData *head = (const UIData*) uiGetHandle(item);
-    
     if (uiGetState(item) == UI_FROZEN) {
         nvgGlobalAlpha(vg, BND_DISABLED_ALPHA);
     }
-    
-    if (head->drawer)
+ 
+    const UIData *head = (const UIData*) uiGetHandle(item);
+    if (head)
     {
-        head->drawer(vg, item, corners);
+        if (head->drawer)
+        {
+            head->drawer(vg, item, corners);
+        }
     }
     
 //    if (head)

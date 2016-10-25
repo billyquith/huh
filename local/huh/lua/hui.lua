@@ -6,7 +6,11 @@ local C = ffi.C
 
 ffi.cdef[[
 
+typedef void(*huiDrawer)(NVGcontext *vg, int item, int corners);
+void huiSetDrawer(int item, huiDrawer d);
+
 int huiFullscreen();
+int huiItem();
 int huiHBox();
 int huiVBox();
 
@@ -47,42 +51,49 @@ hui.box = {
 }
 
 hui.new = function()
-    return setmetatable({ cmds = {}, ids = {} }, { __index = fns })
+    return setmetatable({ _ids = {}, _last = -1 }, { __index = fns })
 end
 
-fns.addCmd = function(self, c, name)
-    table.insert(self.cmds, c)
-end        
+local itemDefFn = function() return C.uiItem() end
 
-fns.draw = function(self)
-    self.ids = {}
-    for i = 1,#self.cmds do
-        local c = self.cmds[i]
-        c(self)
-    end
+fns.register = function(self, name, id)
+    self._ids[name or '_'] = id
+    self._last = id
+    return self
 end
 
-fns.item = function(self, args)
-    local nm, lo, bx, pa = args.name, args.layout, args.box, args.parent
-    local fn = args.func or function() return C.uiItem() end
-    
-    local c = function(self)
-        local id = fn()
-        self.ids[nm or '_'] = id
-        if lo then C.uiSetLayout(id, lo) end
-        if bx then C.uiSetBox(id, bx) end
-        if pa then
-            local pid = self.ids[pa]
-            C.uiInsert(pid, id)
-        end
-    end
-    
-    self:addCmd(c)
+fns.insert = function(self, parent)
+    local pid = self._ids[parent]
+    local id = self._last
+    C.uiInsert(pid, id)
+    return self
 end
 
-fns.fullScreen = function(self, args)
-    args.func = function() return C.huiFullscreen() end
-    return self:item(args)
+fns.layout = function(self, lo)
+    local id = self._last
+    C.uiSetLayout(id, lo)
+    return self
+end
+
+fns.box = function(self, bx)
+    local id = self._last
+    C.uiSetBox(id, bx)
+    return self
+end
+
+fns.item = function(self, name)
+    local id = C.huiItem()
+    return self:register(name, id)
+end
+
+fns.fullScreen = function(self, name)
+    local id = C.huiFullscreen()
+    return self:register(name, id)
+end
+
+fns.button = function(self, name, label, icon)
+    local id = C.huiButton(icon, label, nil)
+    return self:register(name, id)
 end
 
 return hui
