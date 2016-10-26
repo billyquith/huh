@@ -9,17 +9,15 @@ huh.createDisplay(640,480)
 
 function drawUi()
     local g = hui.new()
+    local lo, bx = hui.layout, hui.box
     
     g:fullScreen('root')
     
-    g:item('menu')
-        :layout(hui.layout.HFILL + hui.layout.TOP)
-        :box(hui.box.ROW)
-        :insert('root')
+    g:item('menu'):box(bx.ROW):layout(lo.HFILL + lo.TOP):insert('root')
         
-    g:button('b1', 'Hello1', 0):insert('menu'):layout(hui.layout.TOP + hui.layout.HFILL)
-    g:button('b2', 'Hello2', 0):insert('menu'):layout(hui.layout.TOP + hui.layout.HFILL)
-    g:button('b3', 'Hello3', 0):insert('menu'):layout(hui.layout.TOP + hui.layout.HFILL)
+    g:button('b1', 'Hello1', 0):insert('menu'):layout(lo.HFILL):size(100,20)
+    g:button('b2', 'Hello2', 0):insert('menu'):layout(lo.HFILL):size(100,20)
+    g:button('b3', 'Hello3', 0):insert('menu'):layout(lo.HFILL):size(100,20)
 end
 
 huh.run{

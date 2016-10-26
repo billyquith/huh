@@ -94,7 +94,9 @@ void vg_frameEnd()
 }
 
 /*--------------------------------------------------------------------------------*
- * Blendish & Oui. */
+    Blendish & Oui.
+    - hui*() item functions are convenience widgets
+ */
 
 enum huiType {
     ST_BACKGROUND,

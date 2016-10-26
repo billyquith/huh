@@ -50,18 +50,23 @@ hui.box = {
     JUSTIFY = oui.UI_JUSTIFY
 }
 
+-- Create new UI context
 hui.new = function()
     return setmetatable({ _ids = {}, _last = -1 }, { __index = fns })
 end
 
-local itemDefFn = function() return C.uiItem() end
-
-fns.register = function(self, name, id)
+-- Internal registration of item
+fns._register = function(self, name, id)
     self._ids[name or '_'] = id
     self._last = id
     return self
 end
 
+--------------------------------------------------
+-- Set item layout properties
+--------------------------------------------------
+
+-- insert self in parent
 fns.insert = function(self, parent)
     local pid = self._ids[parent]
     local id = self._last
@@ -81,19 +86,32 @@ fns.box = function(self, bx)
     return self
 end
 
-fns.item = function(self, name)
-    local id = C.huiItem()
-    return self:register(name, id)
+fns.size = function(self, w,h)
+    local id = self._last
+    C.uiSetSize(id, w,h)
+    return self
 end
 
+--------------------------------------------------
+-- Items
+--  * Convenience items that have drawers
+--------------------------------------------------
+
+-- Layout item with no drawer
+fns.item = function(self, name)
+    local id = C.huiItem()
+    return self:_register(name, id)
+end
+
+-- Fullscreen, useful for root
 fns.fullScreen = function(self, name)
     local id = C.huiFullscreen()
-    return self:register(name, id)
+    return self:_register(name, id)
 end
 
 fns.button = function(self, name, label, icon)
     local id = C.huiButton(icon, label, nil)
-    return self:register(name, id)
+    return self:_register(name, id)
 end
 
 return hui
